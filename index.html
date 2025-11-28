@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 Model Viewer -->
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
+    <!-- 引入 html2canvas 用于截图 -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&family=Space+Mono:wght@400;700&display=swap');
         
@@ -76,6 +78,31 @@
             background-color: #111; /* Slightly lighter background to see silhouette if dark */
             --poster-color: #111;
         }
+        
+        /* 截图按钮样式 */
+        .capture-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            z-index: 50;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            background-color: rgba(0,0,0,0.8);
+            color: #666;
+            padding: 4px 8px;
+            border: 1px solid #333;
+            cursor: pointer;
+            transition: all 0.2s;
+            opacity: 0; /* 默认隐藏，hover显示 */
+        }
+        .brutalist-card:hover .capture-btn {
+            opacity: 1;
+        }
+        .capture-btn:hover {
+            background-color: #BEFF00;
+            color: black;
+            border-color: #BEFF00;
+        }
     </style>
 </head>
 <body class="w-full min-h-screen flex flex-col items-center py-20 gap-10">
@@ -91,7 +118,8 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 z-10 px-8">
 
         <!-- Card 1: LUCID -->
-        <div class="brutalist-card w-[350px] h-[500px] flex flex-col justify-between p-0">
+        <div class="brutalist-card w-[350px] h-[500px] flex flex-col justify-between p-0 group">
+            <button onclick="captureCard(this)" class="capture-btn">[ SAVE_CARD ]</button>
             <div class="flex justify-between items-start p-4 border-b border-[#222]">
                 <div class="flex flex-col">
                     <span class="mono-font text-[10px] text-gray-400">STATUS</span>
@@ -125,7 +153,8 @@
         </div>
 
         <!-- Card 2: REM -->
-        <div class="brutalist-card w-[350px] h-[500px] flex flex-col justify-between p-0">
+        <div class="brutalist-card w-[350px] h-[500px] flex flex-col justify-between p-0 group">
+            <button onclick="captureCard(this)" class="capture-btn">[ SAVE_CARD ]</button>
             <div class="flex justify-between items-start p-4 border-b border-[#222]">
                 <div class="flex flex-col">
                     <span class="mono-font text-[10px] text-gray-400">STATUS</span>
@@ -159,7 +188,8 @@
         </div>
 
         <!-- Card 3: LIMBO -->
-        <div class="brutalist-card w-[350px] h-[500px] flex flex-col justify-between p-0">
+        <div class="brutalist-card w-[350px] h-[500px] flex flex-col justify-between p-0 group">
+            <button onclick="captureCard(this)" class="capture-btn">[ SAVE_CARD ]</button>
             <div class="flex justify-between items-start p-4 border-b border-[#222]">
                 <div class="flex flex-col">
                     <span class="mono-font text-[10px] text-gray-400">STATUS</span>
@@ -193,7 +223,8 @@
         </div>
 
         <!-- Card 4: ASTRAL -->
-        <div class="brutalist-card w-[350px] h-[500px] flex flex-col justify-between p-0">
+        <div class="brutalist-card w-[350px] h-[500px] flex flex-col justify-between p-0 group">
+            <button onclick="captureCard(this)" class="capture-btn">[ SAVE_CARD ]</button>
             <div class="flex justify-between items-start p-4 border-b border-[#222]">
                 <div class="flex flex-col">
                     <span class="mono-font text-[10px] text-gray-400">STATUS</span>
@@ -227,7 +258,8 @@
         </div>
 
         <!-- Card 5: MIRAGE -->
-        <div class="brutalist-card w-[350px] h-[500px] flex flex-col justify-between p-0">
+        <div class="brutalist-card w-[350px] h-[500px] flex flex-col justify-between p-0 group">
+            <button onclick="captureCard(this)" class="capture-btn">[ SAVE_CARD ]</button>
             <div class="flex justify-between items-start p-4 border-b border-[#222]">
                 <div class="flex flex-col">
                     <span class="mono-font text-[10px] text-gray-400">STATUS</span>
@@ -261,7 +293,8 @@
         </div>
 
         <!-- Card 6: NIGHTMARE -->
-        <div class="brutalist-card w-[350px] h-[500px] flex flex-col justify-between p-0">
+        <div class="brutalist-card w-[350px] h-[500px] flex flex-col justify-between p-0 group">
+            <button onclick="captureCard(this)" class="capture-btn">[ SAVE_CARD ]</button>
             <div class="flex justify-between items-start p-4 border-b border-[#222]">
                 <div class="flex flex-col">
                     <span class="mono-font text-[10px] text-gray-400">STATUS</span>
@@ -299,6 +332,71 @@
     <footer class="mono-font text-xs text-gray-500 mb-10">
         ARCHIVE_ID: 2024_DREAM_ECHO_NFT_DEMO // END OF LINE
     </footer>
+
+    <!-- 截图脚本 -->
+    <script>
+        async function captureCard(btn) {
+            const card = btn.closest('.brutalist-card');
+            const modelViewer = card.querySelector('model-viewer');
+            
+            // 保存原始按钮文本
+            const originalText = btn.innerText;
+            btn.innerText = '[ PROCESSING... ]';
+            
+            // 临时隐藏按钮以免被截进去
+            btn.style.opacity = '0';
+            
+            try {
+                // 1. 获取模型的截图 (Base64)
+                const modelUrl = modelViewer.toDataURL('image/png');
+                
+                // 2. 创建一个临时 img 标签来替代 model-viewer
+                // 因为 html2canvas 经常无法直接截取 webgl context
+                const img = document.createElement('img');
+                img.src = modelUrl;
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'contain'; // 保持比例
+                img.style.backgroundColor = '#111';
+                img.style.position = 'absolute';
+                img.style.top = '0';
+                img.style.left = '0';
+                
+                // 插入 img 到 model-viewer 的父容器
+                const parent = modelViewer.parentNode;
+                parent.appendChild(img);
+                
+                // 暂时隐藏 model-viewer
+                modelViewer.style.opacity = '0';
+                
+                // 3. 使用 html2canvas 截图整个卡片
+                const canvas = await html2canvas(card, {
+                    backgroundColor: null, 
+                    scale: 2, // 2倍清晰度
+                    useCORS: true
+                });
+                
+                // 4. 下载图片
+                const link = document.createElement('a');
+                // 获取卡片标题作为文件名
+                const title = card.querySelector('h2').innerText;
+                link.download = `DREAM_ECHO_${title}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                // 5. 恢复现场
+                img.remove();
+                modelViewer.style.opacity = '1';
+                
+            } catch (err) {
+                console.error('Screenshot failed:', err);
+                alert('Screenshot failed. Please try again.');
+            } finally {
+                btn.style.opacity = ''; // 恢复 hover 控制
+                btn.innerText = originalText;
+            }
+        }
+    </script>
 
 </body>
 </html>
