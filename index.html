@@ -475,13 +475,19 @@
                 progressBar.style.width = `${percentage}%`;
                 progressText.innerText = `LOADING // ${percentage}%`;
                 
-                if (percentage === 100) {
-                    setTimeout(hideOverlay, 500);
-                }
+                // 移除这里的隐藏逻辑，只在 load 事件中隐藏
+                // if (percentage === 100) { ... } 
             });
 
-            // 监听加载完成事件 (双重保险)
-            viewer.addEventListener('load', hideOverlay);
+            // 监听加载完成事件 (唯一隐藏入口)
+            viewer.addEventListener('load', () => {
+                // 强制显示 100%
+                progressBar.style.width = '100%';
+                progressText.innerText = 'LOADING // 100%';
+                
+                // 稍微延迟后隐藏，让用户看到 100%
+                setTimeout(hideOverlay, 500);
+            });
             
             // 监听错误事件
             viewer.addEventListener('error', (error) => {
