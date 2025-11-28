@@ -457,24 +457,43 @@
             const progressBar = container.querySelector('.progress-bar');
             const progressText = container.querySelector('.progress-text');
 
+            // 函数：隐藏遮罩层
+            const hideOverlay = () => {
+                if (overlay && !overlay.classList.contains('hidden')) {
+                    overlay.classList.add('hidden');
+                    setTimeout(() => {
+                        if (overlay.parentNode) {
+                            overlay.remove();
+                        }
+                    }, 500);
+                }
+            };
+
+            // 监听加载进度
             viewer.addEventListener('progress', (event) => {
                 const percentage = Math.round(event.detail.totalProgress * 100);
                 progressBar.style.width = `${percentage}%`;
                 progressText.innerText = `LOADING // ${percentage}%`;
                 
                 if (percentage === 100) {
-                    setTimeout(() => {
-                        overlay.classList.add('hidden');
-                        // 移除 DOM 以免遮挡交互
-                        setTimeout(() => overlay.remove(), 500);
-                    }, 500);
+                    setTimeout(hideOverlay, 500);
                 }
+            });
+
+            // 监听加载完成事件 (双重保险)
+            viewer.addEventListener('load', hideOverlay);
+            
+            // 监听错误事件
+            viewer.addEventListener('error', (error) => {
+                console.error('Model failed to load:', error);
+                progressText.innerText = 'ERROR // FAILED';
+                progressText.style.color = 'red';
+                progressBar.style.backgroundColor = 'red';
             });
             
             // 防止已经加载完的情况
             if(viewer.loaded) {
-                overlay.classList.add('hidden');
-                overlay.remove();
+                hideOverlay();
             }
         });
     </script>
