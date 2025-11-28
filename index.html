@@ -103,6 +103,24 @@
             color: black;
             border-color: #BEFF00;
         }
+
+        /* 加载层样式 */
+        .loader-overlay {
+            position: absolute;
+            inset: 0;
+            background-color: #050505;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            transition: opacity 0.5s ease-out;
+            pointer-events: none; /* 允许点击穿透，虽然显示时不需要 */
+        }
+        .loader-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body class="w-full min-h-screen flex flex-col items-center py-20 gap-10">
@@ -130,7 +148,15 @@
                     <span class="mono-font text-xs">#8A291F</span>
                 </div>
             </div>
-            <div class="flex-1 relative">
+            <div class="flex-1 relative model-container">
+                <!-- 加载进度条 -->
+                <div class="loader-overlay">
+                    <div class="w-[120px] h-[2px] bg-[#222] mb-3">
+                        <div class="progress-bar h-full bg-[#BEFF00] w-0 transition-all duration-100"></div>
+                    </div>
+                    <span class="progress-text mono-font text-[10px] text-[#BEFF00] tracking-widest">LOADING // 0%</span>
+                </div>
+                
                 <model-viewer 
                     src="1fd9247a80213b623636aecb11b58500.glb" 
                     camera-controls 
@@ -165,7 +191,14 @@
                     <span class="mono-font text-xs">#2B9X01</span>
                 </div>
             </div>
-            <div class="flex-1 relative">
+            <div class="flex-1 relative model-container">
+                <!-- 加载进度条 -->
+                <div class="loader-overlay">
+                    <div class="w-[120px] h-[2px] bg-[#222] mb-3">
+                        <div class="progress-bar h-full bg-[#BEFF00] w-0 transition-all duration-100"></div>
+                    </div>
+                    <span class="progress-text mono-font text-[10px] text-[#BEFF00] tracking-widest">LOADING // 0%</span>
+                </div>
                 <model-viewer 
                     src="6298de6263fd188c016dcc8e5fcbcbb6.glb" 
                     camera-controls 
@@ -200,7 +233,14 @@
                     <span class="mono-font text-xs">#99A0C2</span>
                 </div>
             </div>
-            <div class="flex-1 relative">
+            <div class="flex-1 relative model-container">
+                <!-- 加载进度条 -->
+                <div class="loader-overlay">
+                    <div class="w-[120px] h-[2px] bg-[#222] mb-3">
+                        <div class="progress-bar h-full bg-[#BEFF00] w-0 transition-all duration-100"></div>
+                    </div>
+                    <span class="progress-text mono-font text-[10px] text-[#BEFF00] tracking-widest">LOADING // 0%</span>
+                </div>
                 <model-viewer 
                     src="a4a862dbb9f374dfa146a03d308c53d3.glb" 
                     camera-controls 
@@ -235,7 +275,14 @@
                     <span class="mono-font text-xs">#FF009A</span>
                 </div>
             </div>
-            <div class="flex-1 relative">
+            <div class="flex-1 relative model-container">
+                <!-- 加载进度条 -->
+                <div class="loader-overlay">
+                    <div class="w-[120px] h-[2px] bg-[#222] mb-3">
+                        <div class="progress-bar h-full bg-[#BEFF00] w-0 transition-all duration-100"></div>
+                    </div>
+                    <span class="progress-text mono-font text-[10px] text-[#BEFF00] tracking-widest">LOADING // 0%</span>
+                </div>
                 <model-viewer 
                     src="a6ffab65aef704861d661684318953c5.glb" 
                     camera-controls 
@@ -270,7 +317,14 @@
                     <span class="mono-font text-xs">#X7721B</span>
                 </div>
             </div>
-            <div class="flex-1 relative">
+            <div class="flex-1 relative model-container">
+                <!-- 加载进度条 -->
+                <div class="loader-overlay">
+                    <div class="w-[120px] h-[2px] bg-[#222] mb-3">
+                        <div class="progress-bar h-full bg-[#BEFF00] w-0 transition-all duration-100"></div>
+                    </div>
+                    <span class="progress-text mono-font text-[10px] text-[#BEFF00] tracking-widest">LOADING // 0%</span>
+                </div>
                 <model-viewer 
                     src="c841b149a404db23f5673a6f617855c3.glb" 
                     camera-controls 
@@ -305,7 +359,14 @@
                     <span class="mono-font text-xs">#44091D</span>
                 </div>
             </div>
-            <div class="flex-1 relative">
+            <div class="flex-1 relative model-container">
+                <!-- 加载进度条 -->
+                <div class="loader-overlay">
+                    <div class="w-[120px] h-[2px] bg-[#222] mb-3">
+                        <div class="progress-bar h-full bg-[#BEFF00] w-0 transition-all duration-100"></div>
+                    </div>
+                    <span class="progress-text mono-font text-[10px] text-[#BEFF00] tracking-widest">LOADING // 0%</span>
+                </div>
                 <model-viewer 
                     src="d38f6bd08abcf9d8e8fe3c4752586613.glb" 
                     camera-controls 
@@ -333,58 +394,49 @@
         ARCHIVE_ID: 2024_DREAM_ECHO_NFT_DEMO // END OF LINE
     </footer>
 
-    <!-- 截图脚本 -->
     <script>
+        // 截图脚本
         async function captureCard(btn) {
             const card = btn.closest('.brutalist-card');
             const modelViewer = card.querySelector('model-viewer');
+            const loader = card.querySelector('.loader-overlay');
             
-            // 保存原始按钮文本
             const originalText = btn.innerText;
             btn.innerText = '[ PROCESSING... ]';
-            
-            // 临时隐藏按钮以免被截进去
             btn.style.opacity = '0';
             
+            // 截图时确保加载条不显示
+            if(loader) loader.style.display = 'none';
+
             try {
-                // 1. 获取模型的截图 (Base64)
                 const modelUrl = modelViewer.toDataURL('image/png');
                 
-                // 2. 创建一个临时 img 标签来替代 model-viewer
-                // 因为 html2canvas 经常无法直接截取 webgl context
                 const img = document.createElement('img');
                 img.src = modelUrl;
                 img.style.width = '100%';
                 img.style.height = '100%';
-                img.style.objectFit = 'contain'; // 保持比例
+                img.style.objectFit = 'contain';
                 img.style.backgroundColor = '#111';
                 img.style.position = 'absolute';
                 img.style.top = '0';
                 img.style.left = '0';
                 
-                // 插入 img 到 model-viewer 的父容器
                 const parent = modelViewer.parentNode;
                 parent.appendChild(img);
-                
-                // 暂时隐藏 model-viewer
                 modelViewer.style.opacity = '0';
                 
-                // 3. 使用 html2canvas 截图整个卡片
                 const canvas = await html2canvas(card, {
                     backgroundColor: null, 
-                    scale: 2, // 2倍清晰度
+                    scale: 2, 
                     useCORS: true
                 });
                 
-                // 4. 下载图片
                 const link = document.createElement('a');
-                // 获取卡片标题作为文件名
                 const title = card.querySelector('h2').innerText;
                 link.download = `DREAM_ECHO_${title}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
                 
-                // 5. 恢复现场
                 img.remove();
                 modelViewer.style.opacity = '1';
                 
@@ -392,10 +444,39 @@
                 console.error('Screenshot failed:', err);
                 alert('Screenshot failed. Please try again.');
             } finally {
-                btn.style.opacity = ''; // 恢复 hover 控制
+                if(loader) loader.style.display = ''; // 恢复加载条样式（如果还在加载的话）
+                btn.style.opacity = ''; 
                 btn.innerText = originalText;
             }
         }
+
+        // 加载进度脚本
+        document.querySelectorAll('.model-container').forEach(container => {
+            const viewer = container.querySelector('model-viewer');
+            const overlay = container.querySelector('.loader-overlay');
+            const progressBar = container.querySelector('.progress-bar');
+            const progressText = container.querySelector('.progress-text');
+
+            viewer.addEventListener('progress', (event) => {
+                const percentage = Math.round(event.detail.totalProgress * 100);
+                progressBar.style.width = `${percentage}%`;
+                progressText.innerText = `LOADING // ${percentage}%`;
+                
+                if (percentage === 100) {
+                    setTimeout(() => {
+                        overlay.classList.add('hidden');
+                        // 移除 DOM 以免遮挡交互
+                        setTimeout(() => overlay.remove(), 500);
+                    }, 500);
+                }
+            });
+            
+            // 防止已经加载完的情况
+            if(viewer.loaded) {
+                overlay.classList.add('hidden');
+                overlay.remove();
+            }
+        });
     </script>
 
 </body>
